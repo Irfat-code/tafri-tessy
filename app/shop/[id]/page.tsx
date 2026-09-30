@@ -39,7 +39,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
             )}
           </p>
 
-          <AddToCartPanel product={{ id: product.id, name: product.name, price_kobo: product.price_kobo, stock: product.stock }} />
+          <AddToCartPanel product={{ id: product.id, name: product.name, price_kobo: product.price_kobo, stock: product.stock, image_url: product.image_url }} />
 
           <div className="grid grid-cols-3 gap-3 pt-2 text-center text-xs text-gray-600">
             <div className="rounded-lg bg-white p-3">🌿 Handmade with care</div>

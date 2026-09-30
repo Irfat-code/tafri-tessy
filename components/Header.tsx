@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabaseServer";
+import CartButton from "@/components/CartButton";
 
 const links = [
   { href: "/", label: "Home" },
@@ -28,7 +29,7 @@ export default async function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link href="/cart" aria-label="Cart" className="text-xl hover:text-rose">🛒</Link>
+          <CartButton />
           {user ? (
             <Link href="/account" aria-label="My account"
               className="flex h-9 w-9 items-center justify-center rounded-full bg-forest text-sm font-medium text-white">
