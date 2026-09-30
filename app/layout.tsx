@@ -5,7 +5,7 @@ import Footer from "@/components/Footer";
 import { CartProvider } from "@/lib/cart";
 
 export const metadata: Metadata = {
-  title: "TafriTessy | Wreaths + Designs + More",
+  title: "TafriTessy | Wreaths • Designs • More",
   description: "Handcrafted floral wreaths for every occasion.",
 };
 
