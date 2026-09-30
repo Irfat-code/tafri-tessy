@@ -20,7 +20,7 @@ function layout(title: string, body: string) {
   <h1 style="font-family:Georgia,serif;color:#1f4d3a">🌸 TafriTessy</h1>
   <h2 style="color:#d9667a">${title}</h2>
   ${body}
-  <p style="margin-top:32px;font-size:12px;color:#888">TafriTessy · Wreaths + Designs + More</p>
+  <p style="margin-top:32px;font-size:12px;color:#888">TafriTessy · Wreaths • Designs • More</p>
 </div>`;
 }
 

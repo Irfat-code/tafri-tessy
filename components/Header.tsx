@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabaseServer";
 import CartButton from "@/components/CartButton";
+import Logo from "@/components/Logo";
 
 const links = [
   { href: "/", label: "Home" },
@@ -17,10 +18,7 @@ export default async function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-rose/10 bg-cream/95 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href="/" className="leading-tight">
-          <span className="font-serif text-2xl text-forest">🌸 TafriTessy</span>
-          <span className="block text-[10px] tracking-wide text-gray-500">Wreaths + Designs + More</span>
-        </Link>
+        <Logo />
 
         <nav className="hidden items-center gap-7 text-sm md:flex">
           {links.map((l) => (
@@ -28,7 +26,7 @@ export default async function Header() {
           ))}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3">
           <CartButton />
           {user ? (
             <Link href="/account" aria-label="My account"
@@ -36,7 +34,7 @@ export default async function Header() {
               {initial}
             </Link>
           ) : (
-            <Link href="/login" className="rounded-full bg-forest px-4 py-2 text-sm font-medium text-white hover:opacity-90">
+            <Link href="/login" className="whitespace-nowrap rounded-full bg-forest px-3 py-2 text-sm font-medium text-white hover:opacity-90 sm:px-4">
               Sign In
             </Link>
           )}

@@ -2,13 +2,14 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabaseServer";
 import ProductCard, { Product } from "@/components/ProductCard";
 
+// Photos live in public/wreaths/.
 const occasions = [
-  { label: "Wedding", key: "wedding", color: "f4d6d6" },
-  { label: "Birthday", key: "birthday", color: "f7e3a1" },
-  { label: "Home Decor", key: "home", color: "dcd2ee" },
-  { label: "Funeral", key: "funeral", color: "e4e4e4" },
-  { label: "Seasonal", key: "seasonal", color: "f0c9a0" },
-  { label: "Custom", key: "custom", color: "c9e2c9" },
+  { label: "Wedding", key: "wedding", image: "/wreaths/rose.jpg" },
+  { label: "Birthday", key: "birthday", image: "/wreaths/sunflower.jpg" },
+  { label: "Home Decor", key: "home", image: "/wreaths/garden.jpg" },
+  { label: "Funeral", key: "funeral", image: "/wreaths/funeral.jpg" },
+  { label: "Seasonal", key: "seasonal", image: "/wreaths/christmas.jpg" },
+  { label: "Custom", key: "custom", image: "/wreaths/lavender.jpg" },
 ];
 
 export default async function Home() {
@@ -34,7 +35,7 @@ export default async function Home() {
           </div>
         </div>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="https://placehold.co/800x600/f4d6d6/1f4d3a?text=Hero+Wreath+Photo" alt="Featured wreath"
+        <img src="/wreaths/hero.jpg" alt="Handmade TafriTessy wreath"
           className="h-64 w-full object-cover md:h-full" />
       </section>
 
@@ -45,7 +46,7 @@ export default async function Home() {
           {occasions.map((o) => (
             <Link key={o.key} href={o.key === "custom" ? "/book" : `/shop?category=${o.key}`} className="group text-center">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={`https://placehold.co/200x200/${o.color}/333?text=${encodeURIComponent(o.label)}`} alt={o.label}
+              <img src={o.image} alt={`${o.label} wreath`}
                 className="mx-auto aspect-square w-full max-w-[110px] rounded-full object-cover ring-2 ring-transparent group-hover:ring-rose" />
               <span className="mt-2 block text-sm">{o.label}</span>
             </Link>

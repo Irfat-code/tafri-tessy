@@ -106,11 +106,11 @@ create policy "own favorites" on favorites for all using (user_id = auth.uid()) 
 
 -- Placeholder seed data
 insert into products (name, description, price_kobo, category, image_url, stock) values
- ('Elegant Rose Wreath','Handmade wreath with roses, eucalyptus and greenery.',4500000,'wedding','https://placehold.co/600x600/f4d6d6/333?text=Rose+Wreath',1),
- ('White Garden Wreath','Soft white blooms with lush greenery.',3500000,'home','https://placehold.co/600x600/eef3ea/333?text=Garden+Wreath',2),
- ('Sunflower Wreath','Bright sunflowers for a cheerful welcome.',4000000,'birthday','https://placehold.co/600x600/f7e3a1/333?text=Sunflower',2),
- ('Lavender Dreams','Lavender and purple florals.',3800000,'home','https://placehold.co/600x600/dcd2ee/333?text=Lavender',1),
- ('Rustic Fall Wreath','Warm autumn tones and berries.',4200000,'seasonal','https://placehold.co/600x600/f0c9a0/333?text=Fall+Wreath',1),
- ('Christmas Wreath','Festive reds and evergreens.',5000000,'seasonal','https://placehold.co/600x600/c9e2c9/333?text=Christmas',3);
+ ('Elegant Rose Wreath','Handmade wreath with roses, eucalyptus and greenery.',4500000,'wedding','/wreaths/rose.jpg',1),
+ ('White Garden Wreath','Soft white blooms with lush greenery.',3500000,'home','/wreaths/garden.jpg',2),
+ ('Sunflower Wreath','Bright sunflowers for a cheerful welcome.',4000000,'birthday','/wreaths/sunflower.jpg',2),
+ ('Lavender Dreams','Lavender and purple florals.',3800000,'home','/wreaths/lavender.jpg',1),
+ ('Rustic Fall Wreath','Warm autumn tones and berries.',4200000,'seasonal','/wreaths/fall.jpg',1),
+ ('Christmas Wreath','Festive reds and evergreens.',5000000,'seasonal','/wreaths/christmas.jpg',3);
 
 -- Storage: create a public bucket named "wreaths" and a bucket "inspiration" in the dashboard.
