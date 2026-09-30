@@ -6,4 +6,4 @@ Wreath shop, custom bookings, Paystack checkout, Supabase, Mailgun, Google sign-
 npm install
 npm run dev
 ```
-Open http://localhost:3000. Fill in `.env.local` as instructed step by step.
+Open http://localhost:3001. Fill in `.env.local` as instructed step by step.
