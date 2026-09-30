@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
   // Emails: confirmation to the customer, notification to the owner.
   const toCustomer = customerBookingEmail(booking);
-  await sendMail(booking.email, toCustomer.subject, toCustomer.html);
+  await sendMail(booking.email, toCustomer.subject, toCustomer.html, process.env.OWNER_EMAIL);
 
   if (process.env.OWNER_EMAIL) {
     let link: string | null = null;

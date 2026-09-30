@@ -1,4 +1,5 @@
-export async function sendMail(to: string, subject: string, html: string) {
+// replyTo: where a customer's reply goes (your sister's inbox), since the sender is postmaster@...
+export async function sendMail(to: string, subject: string, html: string, replyTo?: string) {
   if (!process.env.MAILGUN_API_KEY || !process.env.MAILGUN_DOMAIN) {
     console.warn(`Mailgun not configured yet, skipped email: "${subject}" to ${to}`);
     return;
@@ -10,6 +11,7 @@ export async function sendMail(to: string, subject: string, html: string) {
     subject,
     html,
   });
+  if (replyTo) body.set("h:Reply-To", replyTo);
 
   try {
     const res = await fetch(
