@@ -9,6 +9,12 @@ export function esc(value: unknown) {
     .replace(/"/g, "&quot;");
 }
 
+const SITE = process.env.NEXT_PUBLIC_SITE_URL ?? "";
+
+function button(href: string, label: string) {
+  return `<p style="margin-top:24px"><a href="${href}" style="background:#d9667a;color:#fff;padding:12px 24px;border-radius:999px;text-decoration:none">${label}</a></p>`;
+}
+
 function layout(title: string, body: string) {
   return `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto;color:#2a2a2a">
   <h1 style="font-family:Georgia,serif;color:#1f4d3a">🌸 TafriTessy</h1>
@@ -50,7 +56,9 @@ export function customerOrderEmail(order: Order, lines: Line[]) {
     html: layout(
       "Thank you for your order!",
       `<p>Hi ${esc(order.full_name)}, we've received your payment. We'll be in touch soon about delivery.</p>
-       <p><strong>Order #${orderCode(order.order_no)}</strong></p>${orderTable(order, lines)}`
+       <p><strong>Order #${orderCode(order.order_no)}</strong></p>${orderTable(order, lines)}
+       ${button(`${SITE}/account?tab=orders`, "View my orders")}
+       <p style="font-size:13px;color:#666">Questions? Just reply to this email.</p>`
     ),
   };
 }
@@ -91,7 +99,8 @@ export function customerBookingEmail(b: Booking) {
     subject: "We've received your custom wreath request 🌸",
     html: layout(
       "Your request is in!",
-      `<p>Hi ${esc(b.full_name)}, thank you for your custom wreath request. We'll review it and get back to you within 24–48 hours with a quote.</p>${bookingDetails(b)}`
+      `<p>Hi ${esc(b.full_name)}, thank you for your custom wreath request. We'll review it and get back to you within 24–48 hours with a quote.</p>${bookingDetails(b)}
+       <p style="font-size:13px;color:#666">Want to add anything? Just reply to this email.</p>`
     ),
   };
 }
@@ -101,7 +110,7 @@ export function ownerBookingEmail(b: Booking, inspirationLink: string | null) {
     subject: `New custom wreath request: ${b.occasion} from ${b.full_name}`,
     html: layout(
       "New custom booking",
-      `<p><strong>${esc(b.full_name)}</strong><br>${esc(b.email)}<br>${esc(b.phone)}</p>${bookingDetails(b)}
+      `<p><strong>${esc(b.full_name)}</strong><br><a href="mailto:${esc(b.email)}">${esc(b.email)}</a><br>${esc(b.phone)}</p>${bookingDetails(b)}
        ${inspirationLink ? `<p><a href="${esc(inspirationLink)}">View inspiration photo</a> (link works for 7 days)</p>` : ""}`
     ),
   };

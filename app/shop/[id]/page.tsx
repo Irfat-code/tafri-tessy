@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabaseServer";
 import { naira } from "@/lib/format";
 import AddToCartPanel from "@/components/AddToCartPanel";
+import SaveButton from "@/components/SaveButton";
 
 const categoryLabels: Record<string, string> = {
   wedding: "Wedding", birthday: "Birthday", home: "Home Decor", funeral: "Funeral", seasonal: "Seasonal",
@@ -13,6 +14,14 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
   const supabase = await createClient();
   const { data: product } = await supabase.from("products").select("*").eq("id", id).single();
   if (!product) notFound();
+
+  const { data: { user } } = await supabase.auth.getUser();
+  let saved = false;
+  if (user) {
+    const { data: fav } = await supabase
+      .from("favorites").select("product_id").eq("user_id", user.id).eq("product_id", id).maybeSingle();
+    saved = !!fav;
+  }
 
   return (
     <main className="mx-auto max-w-6xl px-4 py-8">
@@ -40,6 +49,7 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
           </p>
 
           <AddToCartPanel product={{ id: product.id, name: product.name, price_kobo: product.price_kobo, stock: product.stock, image_url: product.image_url }} />
+          <SaveButton productId={product.id} userId={user?.id ?? null} initialSaved={saved} />
 
           <div className="grid grid-cols-3 gap-3 pt-2 text-center text-xs text-gray-600">
             <div className="rounded-lg bg-white p-3">🌿 Handmade with care</div>

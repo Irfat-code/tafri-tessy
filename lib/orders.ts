@@ -52,7 +52,7 @@ async function sendOrderEmails(order: Parameters<typeof customerOrderEmail>[0] &
   }));
 
   const toCustomer = customerOrderEmail(order, lines);
-  await sendMail(order.email, toCustomer.subject, toCustomer.html);
+  await sendMail(order.email, toCustomer.subject, toCustomer.html, process.env.OWNER_EMAIL);
 
   if (process.env.OWNER_EMAIL) {
     const toOwner = ownerOrderEmail(order, lines);
