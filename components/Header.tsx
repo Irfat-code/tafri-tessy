@@ -2,6 +2,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabaseServer";
 import CartButton from "@/components/CartButton";
 import Logo from "@/components/Logo";
+import { getAdmin } from "@/lib/admin";
 
 const links = [
   { href: "/", label: "Home" },
@@ -13,6 +14,7 @@ const links = [
 export default async function Header() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  const isAdmin = user ? !!(await getAdmin()) : false;
   const initial = (user?.user_metadata?.full_name ?? user?.email ?? "?")[0].toUpperCase();
 
   return (
@@ -27,6 +29,11 @@ export default async function Header() {
         </nav>
 
         <div className="flex items-center gap-2 sm:gap-3">
+          {isAdmin && (
+            <Link href="/admin" className="rounded-full border border-forest px-3 py-1.5 text-xs font-medium text-forest hover:bg-forest hover:text-white">
+              Admin
+            </Link>
+          )}
           <CartButton />
           {user ? (
             <Link href="/account" aria-label="My account"

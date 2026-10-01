@@ -63,6 +63,18 @@ export function customerOrderEmail(order: Order, lines: Line[]) {
   };
 }
 
+export function customerDeliveredEmail(order: { order_no: number; full_name: string }) {
+  return {
+    subject: `Your TafriTessy order #${orderCode(order.order_no)} has been delivered`,
+    html: layout(
+      "Your wreath has arrived! 🌸",
+      `<p>Hi ${esc(order.full_name)}, your order #${orderCode(order.order_no)} has been delivered. We hope you love it.</p>
+       <p>If anything isn't right, just reply to this email within 48 hours.</p>
+       ${button(`${SITE}/shop`, "Shop more wreaths")}`
+    ),
+  };
+}
+
 export function ownerOrderEmail(order: Order, lines: Line[]) {
   return {
     subject: `New paid order #${orderCode(order.order_no)} (${naira(order.total_kobo)})`,
