@@ -30,7 +30,7 @@ export default async function Header() {
 
         <div className="flex items-center gap-2 sm:gap-3">
           {isAdmin && (
-            <Link href="/admin" className="rounded-full border border-forest px-3 py-1.5 text-xs font-medium text-forest hover:bg-forest hover:text-white">
+            <Link href="/admin" className="hidden rounded-full border border-forest px-3 py-1.5 text-xs font-medium text-forest hover:bg-forest hover:text-white sm:inline-block">
               Admin
             </Link>
           )}
@@ -51,6 +51,8 @@ export default async function Header() {
               {links.map((l) => (
                 <Link key={l.href} href={l.href} className="block rounded px-3 py-2 text-sm hover:bg-cream">{l.label}</Link>
               ))}
+              {user && <Link href="/account" className="block rounded px-3 py-2 text-sm hover:bg-cream">My Account</Link>}
+              {isAdmin && <Link href="/admin" className="block rounded px-3 py-2 text-sm font-medium text-forest hover:bg-cream">Admin</Link>}
             </div>
           </details>
         </div>
