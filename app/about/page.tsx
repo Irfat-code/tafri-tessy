@@ -11,15 +11,23 @@ export default function About() {
         <img src="/wreaths/hero.jpg" alt="A handmade TafriTessy wreath" className="aspect-square w-full rounded-2xl object-cover" />
         <div>
           <Tagline className="text-xs" />
-          <h1 className="mt-3 font-serif text-4xl text-forest">Made by hand, made with love</h1>
+          <h1 className="mt-3 font-serif text-3xl text-forest">Made by hand, made with love</h1>
           <p className="mt-4 text-gray-700">
-            TafriTessy makes handcrafted floral wreaths and designs for weddings, birthdays, homes,
-            memorials and every season in between. Every piece is put together by hand, so no two
-            wreaths are ever exactly alike.
+            Welcome to TafriTessy, where flowers become beautiful expressions of love, remembrance,
+            celebration and joy.
           </p>
           <p className="mt-3 text-gray-700">
-            Whether you want a ready-made wreath delivered to your door or something designed just for
-            your occasion, we&apos;ll help you find the right flowers, colours and style.
+            We create handcrafted wreaths and floral pieces for life&apos;s meaningful moments: funerals and
+            memorial tributes, Christmas and festive celebrations, birthdays, anniversaries, weddings,
+            housewarmings, thoughtful gifts and everyday décor.
+          </p>
+          <p className="mt-3 text-gray-700">
+            Flowers can express love when words are hard to find, bring comfort in times of loss and add
+            warmth to every celebration. That&apos;s why every TafriTessy piece is made with care, creativity
+            and attention to detail.
+          </p>
+          <p className="mt-5 font-serif text-lg italic text-rose">
+            Thoughtfully crafted. Beautifully expressed. Made for every meaningful moment.
           </p>
         </div>
       </section>
