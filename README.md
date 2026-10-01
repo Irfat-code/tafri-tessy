@@ -9,7 +9,7 @@ An online shop for handmade floral wreaths. Customers can buy ready-made wreaths
 - **Shop:** home page, shop with category filters, product pages with stock levels
 - **Cart and checkout:** the cart is saved in the browser, and checkout collects delivery details across Nigerian states
 - **Payments:** Paystack in test mode. The server recalculates every price from the database, and orders are confirmed by both the Paystack webhook and a verify call on the thank-you page
-- **Custom bookings:** a request form with an optional inspiration photo upload
+- **Custom bookings:** a request form with an optional inspiration photo upload, or a Chat on WhatsApp button for a quick consultation
 - **Google sign-in:** Supabase Auth with Google OAuth credentials from Google Cloud Console
 - **Customer account:** My Orders, My Bookings and Saved Items (wishlist)
 - **Emails:** Mailgun order confirmations, booking confirmations, owner notifications and "delivered" emails
@@ -41,6 +41,7 @@ npm run dev                  # http://localhost:3001
 | `PAYSTACK_SECRET_KEY`, `NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY` | Paystack → Settings → API Keys & Webhooks (test keys) |
 | `MAILGUN_API_KEY`, `MAILGUN_DOMAIN`, `MAILGUN_API_BASE` | Mailgun → Domains / API Security |
 | `OWNER_EMAIL` | Receives new order and booking notifications |
+| `NEXT_PUBLIC_WHATSAPP_NUMBER` | The owner's WhatsApp number (e.g. `2348012345678`) for the Chat on WhatsApp buttons |
 | `NEXT_PUBLIC_SITE_URL` | `http://localhost:3001` locally, the Vercel URL in production |
 
 ### Database setup

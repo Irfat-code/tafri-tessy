@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Tagline } from "@/components/Logo";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 export const metadata = { title: "About | TafriTessy" };
 
@@ -51,6 +52,7 @@ export default function About() {
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link href="/shop" className="rounded-full bg-rose px-6 py-3 text-sm font-medium hover:bg-rose-dark">Shop Wreaths</Link>
           <Link href="/book" className="rounded-full border border-white px-6 py-3 text-sm font-medium hover:bg-white/10">Book a Custom Design</Link>
+          <WhatsAppButton />
         </div>
       </section>
     </main>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabaseServer";
 import ProductCard, { Product } from "@/components/ProductCard";
+import WhatsAppButton from "@/components/WhatsAppButton";
 
 // Photos live in public/wreaths/.
 const occasions = [
@@ -73,9 +74,12 @@ export default async function Home() {
       <section className="rounded-2xl bg-forest px-6 py-12 text-center text-white">
         <h2 className="font-serif text-3xl">Need Something Custom?</h2>
         <p className="mx-auto mt-2 max-w-md text-white/85">Tell us what you have in mind and we&apos;ll bring it to life.</p>
-        <Link href="/book" className="mt-6 inline-block rounded-full bg-white px-7 py-3 text-sm font-medium text-forest hover:bg-cream">
-          Book a Consultation
-        </Link>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link href="/book" className="rounded-full bg-white px-7 py-3 text-sm font-medium text-forest hover:bg-cream">
+            Book a Consultation
+          </Link>
+          <WhatsAppButton />
+        </div>
       </section>
     </main>
   );
