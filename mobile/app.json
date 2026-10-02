@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "TafriTessy",
+    "slug": "tafritessy",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tafritessy.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#fdf4ed",
+        "foregroundImage": "./assets/android-icon-foreground.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "package": "com.tafritessy.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "scheme": "tafritessy",
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}

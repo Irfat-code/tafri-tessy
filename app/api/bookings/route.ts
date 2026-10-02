@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@/lib/supabaseServer";
+import { getRequestUser } from "@/lib/requestUser";
 import { sendMail } from "@/lib/mailgun";
 import { customerBookingEmail, ownerBookingEmail } from "@/lib/emails";
 import { BUDGETS, MAX_PHOTO_BYTES, OCCASIONS, WREATH_TYPES } from "@/lib/booking";
@@ -57,8 +57,7 @@ export async function POST(req: Request) {
     }
   }
 
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getRequestUser(req);
 
   const { error } = await supabaseAdmin
     .from("bookings")

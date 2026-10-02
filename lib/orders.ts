@@ -2,6 +2,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { verifyTransaction } from "@/lib/paystack";
 import { sendMail } from "@/lib/mailgun";
 import { customerOrderEmail, ownerOrderEmail } from "@/lib/emails";
+import { clearCart } from "@/lib/cartServer";
 
 // Checks a payment with Paystack and, if it's good, marks the order paid,
 // reduces stock and sends the emails. Safe to call more than once
@@ -35,7 +36,13 @@ export async function fulfillOrder(reference: string) {
   }
 
   const paidOrder = { ...order, status: "paid" };
-  if (marked) await sendOrderEmails(paidOrder);
+  if (marked) {
+    if (order.user_id) {
+      const { data: items } = await supabaseAdmin.from("order_items").select("product_id").eq("order_id", order.id);
+      await clearCart(order.user_id, (items ?? []).map((i) => i.product_id));
+    }
+    await sendOrderEmails(paidOrder);
+  }
   return paidOrder;
 }
 

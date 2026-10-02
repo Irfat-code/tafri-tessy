@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { createClient } from "@/lib/supabaseServer";
+import { getRequestUser } from "@/lib/requestUser";
 import { initializeTransaction } from "@/lib/paystack";
 import { DELIVERY_KOBO } from "@/lib/config";
 import { NIGERIAN_STATES } from "@/lib/nigeria";
@@ -60,8 +60,7 @@ export async function POST(req: Request) {
   const total = subtotal + DELIVERY_KOBO;
 
   // 4. Link the order to the signed-in customer, if any.
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const user = await getRequestUser(req);
 
   // 5. Save the order as "pending" and its items.
   const { data: order, error: orderError } = await supabaseAdmin

@@ -13,6 +13,7 @@ An online shop for handmade floral wreaths. Customers can buy ready-made wreaths
 - **Google sign-in:** Supabase Auth with Google OAuth credentials from Google Cloud Console
 - **Customer account:** My Orders, My Bookings and Saved Items (wishlist)
 - **Emails:** Mailgun order confirmations, booking confirmations, owner notifications and "delivered" emails
+- **Mobile app (`mobile/`):** an Expo app using the same API endpoints and Google sign-in. The cart is shared and updates instantly on both via Supabase Realtime
 - **Admin dashboard (`/admin`):** sales overview, mark orders delivered, manage booking requests, add or edit wreaths with photo upload
 
 ## Tech stack
@@ -51,12 +52,30 @@ In the Supabase SQL Editor, run these in order:
 1. `supabase/schema.sql`: tables, Row Level Security policies and seed wreaths
 2. `supabase/step6.sql`: the `mark_order_paid` function, which marks an order paid and reduces stock in one step
 3. `supabase/step-images.sql`: points the seed wreaths at the photos in `public/wreaths/`
+4. `supabase/step-mobile.sql`: the shared `cart_items` table, with Realtime turned on
 
 Then create two Storage buckets: `wreaths` (public) and `inspiration` (private). To make an account an admin, run:
 
 ```sql
 update profiles set is_admin = true where email = 'you@example.com';
 ```
+
+## API endpoints
+
+The website and the mobile app share these. The app signs in with `Authorization: Bearer <Supabase access token>`; the website uses its login cookie.
+
+| Endpoint | What it does |
+|---|---|
+| `GET /api/products`, `GET /api/products/:id` | Wreaths in the shop |
+| `GET/POST/PATCH/DELETE /api/cart` | The signed-in customer's shared cart |
+| `POST /api/checkout` | Creates the order and starts the Paystack payment |
+| `GET /api/orders` | The customer's paid orders |
+| `POST /api/bookings` | Custom wreath requests |
+| `POST /api/paystack/webhook` | Paystack payment confirmation |
+
+## Mobile app
+
+See [`mobile/README.md`](mobile/README.md) to run it on your phone with Expo Go.
 
 ## Testing payments
 
@@ -67,7 +86,8 @@ The webhook URL is `https://tafritessy.vercel.app/api/paystack/webhook`.
 ## Project structure
 
 ```
-app/            pages and API routes (checkout, Paystack webhook, bookings, admin)
+app/            pages and API routes (products, cart, checkout, orders, bookings, admin)
+mobile/         Expo mobile app (uses the same API endpoints)
 components/     header, footer, product card, booking form, admin form parts
 lib/            Supabase clients, Paystack, Mailgun, email templates, order fulfilment
 supabase/       SQL to set up the database
