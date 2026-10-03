@@ -71,11 +71,15 @@ The website and the mobile app share these. The app signs in with `Authorization
 | `POST /api/checkout` | Creates the order and starts the Paystack payment |
 | `GET /api/orders` | The customer's paid orders |
 | `POST /api/bookings` | Custom wreath requests |
+| `GET /api/orders/verify?reference=...` | Confirms a Paystack payment, like the thank-you page (used by the app after paying) |
+| `GET /api/mobile/config` | Public settings for the app: Supabase URL and anon key, WhatsApp number, delivery fee |
 | `POST /api/paystack/webhook` | Paystack payment confirmation |
 
 ## Mobile app
 
-See [`mobile/README.md`](mobile/README.md) to run it on your phone with Expo Go.
+See [`mobile/README.md`](mobile/README.md). GitHub Actions builds the Android APK on every push that changes `mobile/`; download `TafriTessy.apk` from the **Android app (latest build)** release.
+
+For Google sign-in in the app, add `tafritessy://auth/callback` under Supabase → Authentication → URL Configuration → Redirect URLs.
 
 ## Testing payments
 

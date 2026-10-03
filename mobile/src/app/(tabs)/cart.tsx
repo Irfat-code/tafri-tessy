@@ -1,85 +1,88 @@
-import { useCallback } from "react";
-import { FlatList, Image, Pressable, RefreshControl, StyleSheet, Text, View } from "react-native";
-import { router, useFocusEffect } from "expo-router";
-import { useAuth } from "@/lib/auth";
+import { Alert, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
+import { imageUri, useApp } from "@/lib/app";
 import { useCart } from "@/lib/cart";
-import { colors, DELIVERY_KOBO } from "@/lib/config";
-import { imageUrl, naira } from "@/lib/format";
-import { Button, Center, Stepper, text } from "@/components/ui";
+import { naira } from "@/lib/format";
+import { colors, radius, shadow } from "@/lib/theme";
+import { Button, Empty, Loading, QuantityStepper, Row } from "@/components/ui";
 
 export default function CartScreen() {
-  const { session } = useAuth();
-  const { items, subtotal, loading, refresh, setQuantity, remove } = useCart();
+  const { items, subtotal, count, ready, setQuantity, removeItem } = useCart();
+  const { config } = useApp();
 
-  // Also refresh whenever this tab is opened (Realtime keeps it live while open).
-  useFocusEffect(useCallback(() => { refresh(); }, [refresh]));
-
-  if (!session) {
-    return (
-      <Center>
-        <Text style={text.heading}>Sign in to see your cart</Text>
-        <Text style={[text.muted, { textAlign: "center" }]}>Your cart is shared with the TafriTessy website when you sign in.</Text>
-        <Button title="Sign in" onPress={() => router.push("/account")} />
-      </Center>
-    );
-  }
+  if (!ready) return <Loading />;
 
   if (items.length === 0) {
     return (
-      <Center>
-        <Text style={text.heading}>{loading ? "Loading your cart…" : "Your cart is empty"}</Text>
-        {!loading && <Button title="Browse Wreaths" onPress={() => router.push("/")} />}
-      </Center>
+      <View style={{ padding: 16 }}>
+        <Empty icon="bag-outline" text="Your cart is empty. Find a wreath you love and it will show up here. 🌸" cta="Browse Wreaths" onPress={() => router.push("/shop")} />
+      </View>
     );
   }
 
+  const total = subtotal + config.deliveryKobo;
+
   return (
-    <FlatList
-      data={items}
-      keyExtractor={(i) => i.productId}
-      contentContainerStyle={{ padding: 16, gap: 12 }}
-      refreshControl={<RefreshControl refreshing={false} onRefresh={refresh} />}
-      renderItem={({ item }) => (
-        <View style={styles.row}>
-          <Image source={{ uri: imageUrl(item.image_url) }} style={styles.image} />
-          <View style={{ flex: 1, gap: 8 }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-              <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-              <Pressable onPress={() => remove(item.productId)} hitSlop={10}><Text>🗑</Text></Pressable>
-            </View>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <Stepper value={item.quantity} max={item.stock} onChange={(n) => setQuantity(item.productId, n)} />
-              <Text style={text.price}>{naira(item.price_kobo * item.quantity)}</Text>
+    <View style={{ flex: 1 }}>
+      <FlatList
+        data={items}
+        keyExtractor={(i) => i.productId}
+        contentContainerStyle={{ padding: 16, gap: 12 }}
+        ListHeaderComponent={<Text style={{ color: colors.muted, marginBottom: 2 }}>{count} {count === 1 ? "item" : "items"}</Text>}
+        renderItem={({ item: i }) => (
+          <View style={styles.item}>
+            <Pressable onPress={() => router.push(`/product/${i.productId}`)}>
+              <Image source={{ uri: imageUri(i.image_url) }} style={styles.image} contentFit="cover" />
+            </Pressable>
+            <View style={{ flex: 1, justifyContent: "space-between" }}>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8 }}>
+                <Text style={{ fontSize: 15, fontWeight: "500", flex: 1, color: colors.ink }} numberOfLines={2}>
+                  {i.name}
+                </Text>
+                <Pressable
+                  hitSlop={10}
+                  accessibilityLabel={`Remove ${i.name}`}
+                  onPress={() =>
+                    Alert.alert("Remove from cart?", i.name, [
+                      { text: "Cancel", style: "cancel" },
+                      { text: "Remove", style: "destructive", onPress: () => removeItem(i.productId) },
+                    ])
+                  }
+                >
+                  <Ionicons name="trash-outline" size={20} color="#9ca3af" />
+                </Pressable>
+              </View>
+              <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                <QuantityStepper size="sm" value={i.quantity} max={i.stock} onChange={(n) => setQuantity(i.productId, n)} />
+                <Text style={{ fontWeight: "700", color: colors.forest, fontSize: 15 }}>{naira(i.price_kobo * i.quantity)}</Text>
+              </View>
             </View>
           </View>
-        </View>
-      )}
-      ListFooterComponent={
-        <View style={styles.summary}>
-          <Line label="Subtotal" value={naira(subtotal)} />
-          <Line label="Delivery" value={naira(DELIVERY_KOBO)} />
-          <View style={styles.divider} />
-          <Line label="Total" value={naira(subtotal + DELIVERY_KOBO)} bold />
-          <Button title="Proceed to Checkout" onPress={() => router.push("/checkout")} style={{ marginTop: 8 }} />
-        </View>
-      }
-    />
-  );
-}
+        )}
+      />
 
-function Line({ label, value, bold }: { label: string; value: string; bold?: boolean }) {
-  return (
-    <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-      <Text style={[text.body, bold && { fontWeight: "700", fontSize: 17 }]}>{label}</Text>
-      <Text style={[text.body, bold && { fontWeight: "700", fontSize: 17 }]}>{value}</Text>
+      <View style={styles.summary}>
+        <Row label="Subtotal" value={naira(subtotal)} />
+        <Row label="Delivery" value={naira(config.deliveryKobo)} />
+        <View style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border, paddingTop: 8 }}>
+          <Row label="Total" value={naira(total)} bold />
+        </View>
+        <Button title="Proceed to Checkout" onPress={() => router.push("/checkout")} />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: "row", gap: 12, backgroundColor: colors.white, borderRadius: 14, padding: 12 },
-  image: { width: 80, height: 80, borderRadius: 10 },
-  name: { flex: 1, fontSize: 15, fontWeight: "500" },
-  summary: { backgroundColor: colors.white, borderRadius: 14, padding: 16, gap: 8, marginTop: 4 },
-  divider: { height: 1, backgroundColor: colors.line, marginVertical: 4 },
+  item: { flexDirection: "row", gap: 12, backgroundColor: colors.white, borderRadius: radius.md, padding: 12, ...shadow },
+  image: { width: 88, height: 88, borderRadius: radius.sm, backgroundColor: "#f3e8e0" },
+  summary: {
+    backgroundColor: colors.white,
+    padding: 16,
+    gap: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopColor: colors.border,
+  },
 });

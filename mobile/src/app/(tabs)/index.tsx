@@ -1,96 +1,188 @@
-import { useCallback, useEffect, useState } from "react";
-import { FlatList, Image, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { FlatList, Image as RNImage, Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image } from "expo-image";
 import { router } from "expo-router";
-import { api, type Product } from "@/lib/api";
-import { colors } from "@/lib/config";
-import { imageUrl, naira } from "@/lib/format";
-import { Center, text } from "@/components/ui";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
+import { useApp } from "@/lib/app";
+import { useCart } from "@/lib/cart";
+import { unwrap, useLoader, type Product } from "@/lib/data";
+import { PHOTOS, SHOP_OCCASIONS } from "@/lib/constants";
+import { colors, radius, serif } from "@/lib/theme";
+import ProductCard from "@/components/ProductCard";
+import WhatsAppButton from "@/components/WhatsAppButton";
+import { Button, Loading } from "@/components/ui";
 
-const CATEGORIES = [
-  { key: "", label: "All" },
-  { key: "wedding", label: "Wedding" },
-  { key: "birthday", label: "Birthday" },
-  { key: "home", label: "Home Decor" },
-  { key: "funeral", label: "Funeral" },
-  { key: "seasonal", label: "Seasonal" },
-];
-
-export default function ShopScreen() {
-  const [category, setCategory] = useState("");
-  const [products, setProducts] = useState<Product[] | null>(null);
-  const [error, setError] = useState("");
-  const [refreshing, setRefreshing] = useState(false);
-
-  const load = useCallback(async () => {
-    try {
-      setError("");
-      const q = category ? `?category=${category}` : "";
-      const data = await api<{ products: Product[] }>(`/api/products${q}`);
-      setProducts(data.products);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not load wreaths.");
-    }
-  }, [category]);
-
-  useEffect(() => { setProducts(null); load(); }, [load]);
-
-  const header = (
-    <View>
-      <View style={styles.hero}>
-        <Text style={styles.heroTitle}>Beautiful Wreaths, Made with Love</Text>
-        <Text style={styles.heroText}>Handcrafted floral designs for every occasion.</Text>
-      </View>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-        {CATEGORIES.map((c) => (
-          <Pressable key={c.key} onPress={() => setCategory(c.key)}
-            style={[styles.chip, category === c.key && styles.chipActive]}>
-            <Text style={[styles.chipText, category === c.key && { color: colors.white }]}>{c.label}</Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-    </View>
+export default function HomeScreen() {
+  const { supabase, user } = useApp();
+  const { count } = useCart();
+  const featured = useLoader(
+    async () =>
+      unwrap(
+        await supabase
+          .from("products")
+          .select("id, name, price_kobo, image_url, category")
+          .eq("is_available", true)
+          .order("created_at", { ascending: true })
+          .limit(4)
+      ) as Product[],
+    [supabase]
   );
 
-  if (error && !products) {
-    return <Center><Text style={text.body}>{error}</Text><Text style={text.muted} onPress={load}>Tap to try again</Text></Center>;
-  }
+  const initial = (user?.user_metadata?.full_name ?? user?.email ?? "")[0]?.toUpperCase();
 
   return (
-    <FlatList
-      data={products ?? []}
-      keyExtractor={(p) => p.id}
-      numColumns={2}
-      ListHeaderComponent={header}
-      ListEmptyComponent={<Text style={[text.muted, { textAlign: "center", marginTop: 40 }]}>
-        {products ? "No wreaths in this category yet." : "Loading wreaths…"}
-      </Text>}
-      columnWrapperStyle={{ gap: 12, paddingHorizontal: 16 }}
-      contentContainerStyle={{ gap: 12, paddingBottom: 24 }}
-      refreshControl={<RefreshControl refreshing={refreshing}
-        onRefresh={async () => { setRefreshing(true); await load(); setRefreshing(false); }} />}
-      renderItem={({ item }) => (
-        <Pressable style={styles.card} onPress={() => router.push(`/product/${item.id}`)}>
-          <Image source={{ uri: imageUrl(item.image_url) }} style={styles.image} />
-          <View style={{ padding: 10, gap: 4 }}>
-            <Text style={styles.name} numberOfLines={1}>{item.name}</Text>
-            <Text style={text.price}>{naira(item.price_kobo)}</Text>
-            {item.stock <= 0 && <Text style={{ color: "#dc2626", fontSize: 12 }}>Sold out</Text>}
+    <SafeAreaView edges={["top"]} style={{ flex: 1, backgroundColor: colors.cream }}>
+      <View style={styles.header}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+          <RNImage source={require("../../../assets/logo.png")} style={{ width: 44, height: 40 }} resizeMode="contain" />
+          <View>
+            <Text style={styles.brand}>TafriTessy</Text>
+            <Text style={styles.tagline}>
+              WREATHS <Text style={{ color: colors.rose }}>•</Text> DESIGNS <Text style={{ color: colors.rose }}>•</Text> MORE
+            </Text>
           </View>
+        </View>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+          <Pressable onPress={() => router.push("/cart")} hitSlop={8} accessibilityLabel={`Cart, ${count} items`}>
+            <Ionicons name="bag-outline" size={24} color={colors.ink} />
+            {count > 0 && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{count}</Text>
+              </View>
+            )}
+          </Pressable>
+          <Pressable onPress={() => router.push("/account")} accessibilityLabel="My account" style={styles.avatar}>
+            {initial ? (
+              <Text style={{ color: colors.white, fontWeight: "600" }}>{initial}</Text>
+            ) : (
+              <Ionicons name="person" size={16} color={colors.white} />
+            )}
+          </Pressable>
+        </View>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: 32, gap: 28 }}
+        refreshControl={<RefreshControl refreshing={featured.refreshing} onRefresh={featured.refresh} tintColor={colors.rose} colors={[colors.rose]} />}
+      >
+        {/* Hero */}
+        <View style={styles.hero}>
+          <Image source={PHOTOS.hero} style={styles.heroImage} contentFit="cover" />
+          <View style={{ padding: 20, gap: 12 }}>
+            <Text style={styles.heroTitle}>Beautiful Wreaths, Made with Love</Text>
+            <Text style={{ color: "rgba(255,255,255,0.85)", fontSize: 15 }}>
+              Handcrafted floral designs for every occasion, from celebrations to everyday moments.
+            </Text>
+            <View style={{ flexDirection: "row", gap: 10, marginTop: 4 }}>
+              <Button title="Shop Wreaths" onPress={() => router.push("/shop")} style={{ flex: 1, paddingHorizontal: 8 }} />
+              <Button title="Book Custom" variant="ghost" onPress={() => router.push("/book")} style={{ flex: 1, paddingHorizontal: 8 }} />
+            </View>
+          </View>
+        </View>
+
+        {/* Shop by occasion */}
+        <View style={{ gap: 14 }}>
+          <Text style={[styles.section, { paddingHorizontal: 16 }]}>Shop by Occasion</Text>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16, gap: 16 }}>
+            {SHOP_OCCASIONS.map((o) => (
+              <Pressable
+                key={o.key}
+                onPress={() =>
+                  o.key === "custom" ? router.push("/book") : router.push({ pathname: "/shop", params: { category: o.key } })
+                }
+                style={{ alignItems: "center", gap: 8, width: 78 }}
+                accessibilityRole="button"
+                accessibilityLabel={`${o.label} wreaths`}
+              >
+                <Image source={o.image} style={styles.occasion} contentFit="cover" />
+                <Text style={{ fontSize: 13, color: colors.ink }}>{o.label}</Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        </View>
+
+        {/* Featured */}
+        <View style={{ gap: 14 }}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.section}>Featured Wreaths</Text>
+            <Pressable onPress={() => router.push("/shop")} hitSlop={8}>
+              <Text style={{ color: colors.rose, fontSize: 14, fontWeight: "500" }}>View All →</Text>
+            </Pressable>
+          </View>
+          {featured.loading ? (
+            <Loading />
+          ) : !featured.data?.length ? (
+            <Text style={{ color: colors.muted, paddingHorizontal: 16 }}>
+              {featured.error ?? "No wreaths yet. Check back soon. 🌸"}
+            </Text>
+          ) : (
+            <FlatList
+              horizontal
+              data={featured.data}
+              keyExtractor={(p) => p.id}
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16, gap: 14, paddingBottom: 6 }}
+              renderItem={({ item }) => <ProductCard product={item} width={170} />}
+            />
+          )}
+        </View>
+
+        {/* Custom CTA */}
+        <View style={styles.cta}>
+          <Text style={[styles.heroTitle, { textAlign: "center", fontSize: 26 }]}>Need Something Custom?</Text>
+          <Text style={{ color: "rgba(255,255,255,0.85)", textAlign: "center", fontSize: 15 }}>
+            Tell us what you have in mind and we&apos;ll bring it to life.
+          </Text>
+          <Button title="Book a Consultation" variant="white" onPress={() => router.push("/book")} />
+          <WhatsAppButton />
+        </View>
+
+        <Pressable onPress={() => router.push("/about")} style={{ alignItems: "center" }}>
+          <Text style={{ color: colors.rose, fontSize: 14 }}>About TafriTessy</Text>
         </Pressable>
-      )}
-    />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  hero: { margin: 16, padding: 20, borderRadius: 18, backgroundColor: colors.forest, gap: 6 },
-  heroTitle: { fontFamily: "serif", fontSize: 24, color: colors.white },
-  heroText: { color: "rgba(255,255,255,0.85)" },
-  chips: { gap: 8, paddingHorizontal: 16, paddingBottom: 12 },
-  chip: { borderWidth: 1, borderColor: colors.line, backgroundColor: colors.white, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 8 },
-  chipActive: { backgroundColor: colors.forest, borderColor: colors.forest },
-  chipText: { color: colors.ink, fontSize: 14 },
-  card: { flex: 1, backgroundColor: colors.white, borderRadius: 14, overflow: "hidden" },
-  image: { width: "100%", aspectRatio: 1 },
-  name: { fontSize: 14, fontWeight: "500", color: colors.ink },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "rgba(217,102,122,0.1)",
+  },
+  brand: { fontFamily: serif, fontSize: 22, color: colors.forest, lineHeight: 26 },
+  tagline: { fontSize: 8, letterSpacing: 1.6, color: colors.forest },
+  badge: {
+    position: "absolute",
+    right: -8,
+    top: -6,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.rose,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 4,
+  },
+  badgeText: { color: colors.white, fontSize: 11, fontWeight: "600" },
+  avatar: {
+    width: 34,
+    height: 34,
+    borderRadius: 17,
+    backgroundColor: colors.forest,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  hero: { marginHorizontal: 16, marginTop: 12, borderRadius: radius.lg, overflow: "hidden", backgroundColor: colors.forest },
+  heroImage: { width: "100%", height: 220 },
+  heroTitle: { fontFamily: serif, fontSize: 30, lineHeight: 36, color: colors.white },
+  section: { fontFamily: serif, fontSize: 22, color: colors.forest },
+  sectionHeader: { flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", paddingHorizontal: 16 },
+  occasion: { width: 74, height: 74, borderRadius: 37, backgroundColor: "#f3e8e0" },
+  cta: { marginHorizontal: 16, borderRadius: radius.lg, backgroundColor: colors.forest, padding: 24, gap: 12 },
 });
