@@ -1,1 +1,2 @@
-mobile/
+# The Expo app (top-level folder only; app/api/mobile/ is part of the website).
+/mobile/
